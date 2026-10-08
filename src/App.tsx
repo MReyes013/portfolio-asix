@@ -27,6 +27,7 @@ export default function App() {
             language={language}
             setLanguage={setLanguage}
             cyberMode={cyberMode}
+            setCyberMode={setCyberMode}
           />
         </main>
 
