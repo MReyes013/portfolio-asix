@@ -116,7 +116,6 @@ export default function ProjectGallery({
     return t.inProgress;
   };
 
-  const themeText = cyberMode ? "text-[#eafff0]" : "text-black";
   const mutedText = cyberMode ? "text-[#eafff0]/50" : "text-black/50";
   const cardTheme = cyberMode
     ? "border border-[#00ff66]/10 bg-[#0a120d]"
