@@ -4,11 +4,11 @@ import {
   Code2,
   GraduationCap,
   Languages,
+  FileText,
   Terminal,
-  Upload,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const defaultAvatar = "/images/Foto-carnet.jpg";
 
@@ -35,7 +35,7 @@ const sidebarTranslations = {
     communication: "Comunicación",
     level: "Nivel",
     cyberMode: "Dark Mode",
-    cyberModeActive: "Modo oscuro",
+    cyberModeActive: "Restablecer",
 
     cyberTerminal: [
       "> INICIALIZANDO SISTEMA...",
@@ -1214,32 +1214,11 @@ export default function Sidebar({
   cyberMode,
   setCyberMode,
 }: SidebarProps) {
-  const [avatar, setAvatar] = useState(defaultAvatar);
+  const avatar = defaultAvatar;
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const [activeSection, setActiveSection] =
     useState<AboutSection>("formacion");
-
-  const fileInputRef =
-    useRef<HTMLInputElement>(null);
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleAvatarChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const imageUrl = URL.createObjectURL(file);
-
-    setAvatar(imageUrl);
-  };
 
   const openAbout = () => {
     setAboutOpen(true);
@@ -1296,18 +1275,12 @@ export default function Sidebar({
         {/* PERFIL */}
         <div>
           <div className="flex items-center gap-5">
-            <button
-              type="button"
-              onClick={handleAvatarClick}
-              className={`group relative block shrink-0 ${
+            <div
+              className={`relative block shrink-0 ${
                 cyberMode
                   ? "animate-[cyberPulse_3s_ease-in-out_infinite]"
                   : ""
               }`}
-              aria-label={
-                sidebarTranslations[language]
-                  .changeProfilePhoto
-              }
             >
               <img
                 src={avatar}
@@ -1327,22 +1300,7 @@ export default function Sidebar({
                 </>
               )}
 
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/55 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <Upload
-                  size={19}
-                  strokeWidth={1.7}
-                  className="text-white"
-                />
-              </div>
-            </button>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
+            </div>
 
             <div className="flex min-w-0 flex-col gap-2">
               <h1 className="text-sm font-semibold tracking-tight">
@@ -1457,22 +1415,62 @@ export default function Sidebar({
 
         {/* FOOTER */}
         <div className="mt-auto pt-6">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            {["LinkedIn", "Instagram", "X", "GitHub"].map(
-              (social) => (
-                <a
-                  key={social}
-                  href="#"
-                  className={`text-xs transition-colors ${
-                    cyberMode
-                      ? "text-[#d9ffe3]/35 hover:text-[#00ff66]"
-                      : "text-black/40 hover:text-black"
-                  }`}
+          <div className="flex flex-wrap items-center gap-3">
+            {[
+              { name: "LinkedIn", url: "https://www.linkedin.com/in/martin-reyes-864726298", icon: "linkedin" },
+              { name: "Instagram", url: "#", icon: "instagram" },
+              { name: "X", url: "#", icon: "x" },
+              { name: "GitHub", url: "https://github.com/MReyes013", icon: "github" },
+            ].map((social) => (
+              <a
+                key={social.name}
+                href={social.url}
+                target={social.url !== "#" ? "_blank" : undefined}
+                rel={social.url !== "#" ? "noopener noreferrer" : undefined}
+                aria-label={social.name}
+                title={social.name}
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 ${
+                  cyberMode
+                    ? "border-[#00ff66]/15 bg-[#00ff66]/5 text-[#d9ffe3]/55 hover:border-[#00ff66]/50 hover:bg-[#00ff66]/10 hover:text-[#00ff66]"
+                    : "border-black/10 bg-[#F3F4F6] text-black/50 hover:border-black/20 hover:bg-black hover:text-white"
+                }`}
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-[17px] w-[17px]"
+                  fill="currentColor"
                 >
-                  {social}
-                </a>
-              ),
-            )}
+                  {social.icon === "linkedin" && (
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.35V9h3.414v1.561h.049c.476-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM3.555 9h3.564v11.452H3.555V9ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z" />
+                  )}
+                  {social.icon === "instagram" && (
+                    <path d="M7 2C4.239 2 2 4.239 2 7v10c0 2.761 2.239 5 5 5h10c2.761 0 5-2.239 5-5V7c0-2.761-2.239-5-5-5H7Zm0 2h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm11 1.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z" />
+                  )}
+                  {social.icon === "x" && (
+                    <path d="M18.9 2H22l-6.78 7.75L23.2 22h-6.25l-4.9-7.4L5.58 22H2.45l7.25-8.29L1.9 2h6.4l4.43 6.76L18.9 2Zm-1.1 18h1.73L7.37 3.9H5.51L17.8 20Z" />
+                  )}
+                  {social.icon === "github" && (
+                    <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.68-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.92.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.95 0 0 .94-.3 3.06 1.14a10.65 10.65 0 0 1 5.57 0c2.12-1.44 3.06-1.14 3.06-1.14.61 1.53.23 2.67.11 2.95.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.23-5.1 5.51.4.35.75 1.03.75 2.08V22c0 .29.2.63.76.52A11.1 11.1 0 0 0 12 .9Z" />
+                  )}
+                </svg>
+              </a>
+            ))}
+
+            <a
+              href="cv/CV.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+                cyberMode
+                  ? "border-[#00ff66]/20 bg-[#00ff66]/5 text-[#00ff66]/80 hover:border-[#00ff66]/50 hover:bg-[#00ff66]/10"
+                  : "border-black/10 bg-[#F3F4F6] text-black/65 hover:border-black/25 hover:bg-black hover:text-white"
+              }`}
+            >
+              <FileText size={14} strokeWidth={1.8} />
+              {language === "ES" ? "Currículum" : "Resume"}
+              <ArrowUpRight size={13} strokeWidth={1.8} />
+            </a>
           </div>
 
           {/* CYBER MODE */}
