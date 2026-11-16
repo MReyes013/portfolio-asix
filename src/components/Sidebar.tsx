@@ -4,6 +4,7 @@ import {
   Code2,
   GraduationCap,
   Languages,
+  Leaf,
   FileText,
   Terminal,
   X,
@@ -146,8 +147,8 @@ const sidebarTranslations = {
     languagesTitle: "Languages",
     communication: "Communication",
     level: "Level",
-    cyberMode: "Cyber Mode",
-    cyberModeActive: "Cyber Mode active",
+    cyberMode: "Dark Mode",
+    cyberModeActive: "Reset",
 
     cyberTerminal: [
       "> INITIALIZING SYSTEM...",
@@ -266,71 +267,37 @@ function AboutCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative min-h-[170px] rounded-[1.5rem] p-6 text-left transition-all duration-300 ${
-        active
-          ? cyberMode
-            ? "border border-[#00ff66]/20 bg-[#07140b] text-[#b7ffc9]"
-            : "bg-black text-white"
-          : cyberMode
-            ? "border border-[#00ff66]/10 bg-[#07100a] text-[#d9ffe3] hover:bg-[#0a1a0e]"
-            : "bg-[#F3F4F6] text-black hover:bg-[#E9EAEC]"
+      className={`group relative flex min-h-[118px] items-center gap-4 overflow-hidden rounded-2xl border p-5 text-left transition-all duration-300 ${
+        cyberMode
+          ? active
+            ? "border-[#00ff66]/30 bg-[#0a1b0e] text-[#eafff0]"
+            : "border-[#00ff66]/10 bg-[#07100a] text-[#d9ffe3] hover:border-[#00ff66]/25"
+          : active
+            ? "border-blue-600 bg-[#10233f] text-white shadow-lg shadow-blue-950/10"
+            : "border-black/[0.06] bg-white text-black hover:border-blue-200 hover:bg-blue-50/50"
       }`}
     >
-      <div className="flex items-start justify-between">
-        <span
-          className={`text-xs font-medium tracking-[0.18em] ${
-            active
-              ? cyberMode
-                ? "text-[#00ff66]/40"
-                : "text-white/50"
-              : cyberMode
-                ? "text-[#00ff66]/30"
-                : "text-black/35"
-          }`}
-        >
-          {number}
-        </span>
-
-        <div
-          className={`transition-all duration-300 ${
-            active
-              ? "translate-x-0 opacity-100"
-              : "translate-x-1 opacity-70 group-hover:translate-x-0 group-hover:opacity-100"
-          }`}
-        >
-          {icon}
-        </div>
-      </div>
-
-      <div className="mt-12">
-        <h3 className="text-lg font-semibold tracking-tight">
-          {title}
-        </h3>
-
-        <p
-          className={`mt-2 text-sm leading-5 ${
-            active
-              ? cyberMode
-                ? "text-[#b7ffc9]/60"
-                : "text-white/60"
-              : cyberMode
-                ? "text-[#d9ffe3]/50"
-                : "text-black/50"
-          }`}
-        >
-          {description}
-        </p>
-      </div>
-
-      <div
-        className={`absolute bottom-0 left-6 right-6 h-[2px] rounded-full transition-all duration-300 ${
-          active
-            ? cyberMode
-              ? "bg-[#00ff66] shadow-[0_0_12px_rgba(0,255,102,0.7)]"
-              : "bg-white"
-            : "bg-transparent"
-        }`}
-      />
+      <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors ${
+        cyberMode
+          ? "bg-[#00ff66]/[0.08] text-[#00ff66]"
+          : active
+            ? "bg-white/10 text-white"
+            : "bg-blue-50 text-blue-700"
+      }`}>
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className={`block text-[10px] font-semibold tracking-[0.18em] ${
+          cyberMode ? "text-[#00ff66]/45" : active ? "text-blue-200" : "text-black/35"
+        }`}>{number} / 02</span>
+        <span className="mt-1 block text-base font-semibold tracking-tight">{title}</span>
+        <span className={`mt-1 block text-xs leading-5 ${
+          cyberMode ? "text-[#d9ffe3]/50" : active ? "text-white/65" : "text-black/45"
+        }`}>{description}</span>
+      </span>
+      <ArrowUpRight size={17} className={`shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
+        cyberMode ? "text-[#00ff66]/55" : active ? "text-white/70" : "text-black/30"
+      }`} />
     </button>
   );
 }
@@ -341,7 +308,6 @@ function CyberTerminal({
   language: "ES" | "EN";
 }) {
   const lines = sidebarTranslations[language].cyberTerminal;
-
   const [visibleLines, setVisibleLines] = useState(1);
   const [typedText, setTypedText] = useState("");
   const [lineIndex, setLineIndex] = useState(0);
@@ -362,73 +328,45 @@ function CyberTerminal({
         setCharIndex(0);
         setTypedText("");
       }, 2800);
-
       return () => window.clearTimeout(restartTimer);
     }
 
     const currentLine = lines[lineIndex];
-
     if (charIndex < currentLine.length) {
       const timer = window.setTimeout(() => {
         setTypedText((previous) => previous + currentLine[charIndex]);
         setCharIndex((previous) => previous + 1);
       }, 32);
-
       return () => window.clearTimeout(timer);
     }
 
     const nextLineTimer = window.setTimeout(() => {
-      setVisibleLines((previous) =>
-        Math.min(previous + 1, lines.length),
-      );
-
+      setVisibleLines((previous) => Math.min(previous + 1, lines.length));
       setLineIndex((previous) => previous + 1);
       setCharIndex(0);
       setTypedText("");
     }, 420);
-
     return () => window.clearTimeout(nextLineTimer);
   }, [charIndex, lineIndex, lines]);
 
   return (
-    <div className="relative mt-7 overflow-hidden rounded-[1.25rem] border border-[#00ff66]/10 bg-black/80 p-4 font-mono text-[10px] leading-6 shadow-[0_0_35px_rgba(0,255,102,0.04)]">
+    <div className="relative mt-6 overflow-hidden rounded-xl border border-[#00ff66]/10 bg-black/80 p-4 font-mono text-[10px] leading-6">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,255,102,0.025)_50%)] bg-[length:100%_4px]" />
-
       <div className="relative">
         <div className="mb-3 flex items-center gap-2 border-b border-[#00ff66]/10 pb-3">
           <span className="h-2 w-2 rounded-full bg-red-500/70" />
           <span className="h-2 w-2 rounded-full bg-yellow-400/70" />
-          <span className="h-2 w-2 rounded-full bg-[#00ff66]/80 shadow-[0_0_8px_rgba(0,255,102,0.7)]" />
-
-          <span className="ml-2 text-[#00ff66]/25">
-            terminal://portfolio
-          </span>
+          <span className="h-2 w-2 rounded-full bg-[#00ff66]/80" />
+          <span className="ml-2 text-[#00ff66]/35">terminal://portfolio</span>
         </div>
-
-        <div className="min-h-[150px]">
+        <div className="min-h-[130px]">
           {lines.map((line, index) => {
-            if (index >= visibleLines) {
-              return null;
-            }
-
+            if (index >= visibleLines) return null;
             const isCurrent = index === lineIndex;
-
             return (
-              <div
-                key={`${line}-${index}`}
-                className={`transition-opacity duration-300 ${
-                  index < lineIndex
-                    ? "text-[#00ff66]/35"
-                    : "text-[#00ff66]/75"
-                }`}
-              >
+              <div key={`${line}-${index}`} className={index < lineIndex ? "text-[#00ff66]/35" : "text-[#00ff66]/75"}>
                 {isCurrent ? typedText : line}
-
-                {isCurrent && (
-                  <span className="ml-0.5 inline-block animate-pulse text-[#00ff66]">
-                    ▮
-                  </span>
-                )}
+                {isCurrent && <span className="ml-0.5 animate-pulse text-[#00ff66]">▮</span>}
               </div>
             );
           })}
@@ -448,756 +386,175 @@ function AboutExperience({
   cyberMode: boolean;
 }) {
   const t = sidebarTranslations[language];
+  const surface = cyberMode
+    ? "border border-[#00ff66]/10 bg-[#07100a] text-[#eafff0]"
+    : "border border-black/[0.06] bg-white text-[#151923]";
+  const muted = cyberMode ? "text-[#d9ffe3]/60" : "text-slate-600";
+  const eyebrow = cyberMode ? "text-[#00ff66]/55" : "text-blue-700";
 
   if (section === "formacion") {
+    const hard = t.about.formacion.competencies.hard;
+    const soft = t.about.formacion.competencies.soft;
+    const values = t.about.formacion.paradigm.values;
+
     return (
-      <div className="animate-[fadeIn_400ms_ease-out]">
-        <div
-          className={`rounded-[1.5rem] p-7 sm:p-9 ${
-            cyberMode
-              ? "border border-[#00ff66]/10 bg-[#030804] text-[#eafff0]"
-              : "bg-black text-white"
-          }`}
-        >
-          <p
-            className={`text-xs font-medium uppercase tracking-[0.2em] ${
-              cyberMode
-                ? "text-[#00ff66]/40"
-                : "text-white/35"
-            }`}
-          >
-            {t.about.formacion.label}
-          </p>
-
-          <h3 className="mt-5 max-w-4xl text-3xl font-semibold leading-[1.05] tracking-tight sm:text-4xl lg:text-5xl">
-            {t.about.formacion.headline}
-          </h3>
-
-          <p
-            className={`mt-6 max-w-4xl text-sm leading-7 sm:text-base ${
-              cyberMode
-                ? "text-[#d9ffe3]/55"
-                : "text-white/55"
-            }`}
-          >
-            {t.about.formacion.intro}
-          </p>
-
-          {cyberMode && (
-            <CyberTerminal language={language} />
+      <div className="space-y-5 animate-[fadeIn_400ms_ease-out]">
+        {/* Presentación */}
+        <section className={`relative overflow-hidden rounded-[1.6rem] p-7 sm:p-9 ${
+          cyberMode
+            ? "border border-[#00ff66]/15 bg-[#030b05] text-[#eafff0]"
+            : "bg-[#10233f] text-white"
+        }`}>
+          {!cyberMode && (
+            <>
+              <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-32 right-1/4 h-64 w-64 rounded-full bg-cyan-300/10 blur-3xl" />
+            </>
           )}
-        </div>
-
-        <div
-          className={`group relative mt-4 overflow-hidden rounded-[1.5rem] p-7 sm:p-8 ${
-            cyberMode
-              ? "border border-[#00ff66]/10 bg-[#030804] text-[#eafff0]"
-              : "bg-black text-white"
-          }`}
-        >
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border border-white/10 transition-transform duration-700 group-hover:scale-110" />
-
-          <div className="pointer-events-none absolute -bottom-32 -left-24 h-64 w-64 rounded-full border border-white/5 transition-transform duration-700 group-hover:scale-105" />
-
-          <div className="relative z-10">
-            <div className="flex items-start justify-between gap-6">
-              <div>
-                <p
-                  className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                    cyberMode
-                      ? "text-[#00ff66]/40"
-                      : "text-white/35"
-                  }`}
-                >
-                  02 — {t.about.formacion.paradigm.label}
-                </p>
-
-                <h3 className="mt-4 max-w-2xl text-3xl font-semibold leading-[1.05] tracking-tight sm:text-4xl">
-                  {t.about.formacion.paradigm.title}
-                </h3>
-              </div>
-
-              <div
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${
-                  cyberMode
-                    ? "border-[#00ff66]/15 bg-[#00ff66]/5"
-                    : "border-white/10 bg-white/5"
-                }`}
-              >
-                <Brain
-                  size={19}
-                  strokeWidth={1.5}
-                  className={`transition-transform duration-500 group-hover:scale-110 ${
-                    cyberMode
-                      ? "text-[#00ff66]/60"
-                      : "text-white/55"
-                  }`}
-                />
-              </div>
+          <div className="relative">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
+                cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-white/10 text-blue-100"
+              }`}>{t.about.formacion.label}</span>
+              <span className={`text-[10px] font-medium uppercase tracking-[0.15em] ${
+                cyberMode ? "text-[#00ff66]/35" : "text-white/45"
+              }`}>ASIX · Systems · Networks · Cybersecurity</span>
             </div>
-
-            <div
-              className={`relative mt-10 overflow-hidden rounded-[1.25rem] border p-6 sm:p-7 ${
-                cyberMode
-                  ? "border-[#00ff66]/10 bg-[#00ff66]/[0.03]"
-                  : "border-white/10 bg-white/[0.04]"
-              }`}
-            >
-              <div className="flex flex-col gap-8">
-                <div className="flex items-center justify-between gap-4">
-                  <span
-                    className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                      cyberMode
-                        ? "text-[#00ff66]/30"
-                        : "text-white/30"
-                    }`}
-                  >
-                    {language === "ES"
-                      ? "Mi forma de verlo"
-                      : "The way I see it"}
-                  </span>
-
-                  <span
-                    className={`text-[10px] font-medium uppercase tracking-[0.18em] ${
-                      cyberMode
-                        ? "text-[#00ff66]/20"
-                        : "text-white/20"
-                    }`}
-                  >
-                    01
-                  </span>
-                </div>
-
-                <div>
-                  <p className="text-5xl font-semibold tracking-[-0.05em] sm:text-6xl">
-                    {language === "ES"
-                      ? "LIBERTAD"
-                      : "FREEDOM"}
-                  </p>
-
-                  <div
-                    className={`mt-4 h-px w-full ${
-                      cyberMode
-                        ? "bg-[#00ff66]/10"
-                        : "bg-white/10"
-                    }`}
-                  >
-                    <div
-                      className={`h-px w-1/3 transition-all duration-700 group-hover:w-2/3 ${
-                        cyberMode
-                          ? "bg-[#00ff66]"
-                          : "bg-white"
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-2 sm:grid-cols-4">
-                  {t.about.formacion.paradigm.values.map(
-                    (value, index) => (
-                      <div
-                        key={value}
-                        className={`group/value rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 ${
-                          cyberMode
-                            ? "border-[#00ff66]/10 bg-[#00ff66]/[0.02] hover:border-[#00ff66]/20 hover:bg-[#00ff66]/[0.05]"
-                            : "border-white/8 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.07]"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <span
-                            className={`text-[9px] font-semibold tracking-[0.15em] ${
-                              cyberMode
-                                ? "text-[#00ff66]/25"
-                                : "text-white/25"
-                            }`}
-                          >
-                            0{index + 1}
-                          </span>
-
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full transition-transform duration-300 group-hover/value:scale-150 ${
-                              cyberMode
-                                ? "bg-[#00ff66]/50"
-                                : "bg-white/30"
-                            }`}
-                          />
-                        </div>
-
-                        <p
-                          className={`mt-7 text-xs font-medium leading-5 ${
-                            cyberMode
-                              ? "text-[#d9ffe3]/65"
-                              : "text-white/65"
-                          }`}
-                        >
-                          {value}
-                        </p>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
+            <h3 className="mt-6 max-w-4xl text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.8rem]">
+              {t.about.formacion.headline}
+            </h3>
+            <p className={`mt-5 max-w-3xl text-sm leading-7 sm:text-base ${
+              cyberMode ? "text-[#d9ffe3]/65" : "text-blue-50/75"
+            }`}>{t.about.formacion.intro}</p>
+            <div className="mt-7 flex flex-wrap gap-2">
+              {(language === "ES"
+                ? ["Sistemas", "Redes", "Resolución de problemas", "Ciberseguridad"]
+                : ["Systems", "Networking", "Problem solving", "Cybersecurity"]
+              ).map((item) => (
+                <span key={item} className={`rounded-full border px-3 py-1.5 text-[11px] font-medium ${
+                  cyberMode ? "border-[#00ff66]/15 bg-[#00ff66]/[0.04] text-[#d9ffe3]/70" : "border-white/15 bg-white/[0.06] text-white/80"
+                }`}>{item}</span>
+              ))}
             </div>
+            {cyberMode && <CyberTerminal language={language} />}
+          </div>
+        </section>
 
-            <p
-              className={`mt-7 max-w-4xl text-sm leading-7 sm:text-base ${
-                cyberMode
-                  ? "text-[#d9ffe3]/55"
-                  : "text-white/55"
-              }`}
-            >
-              {t.about.formacion.paradigm.description}
-            </p>
-
-            <div
-              className={`mt-8 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${
-                cyberMode
-                  ? "border-[#00ff66]/10"
-                  : "border-white/10"
-              }`}
-            >
-              <span
-                className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                  cyberMode
-                    ? "text-[#00ff66]/30"
-                    : "text-white/30"
-                }`}
-              >
-                {language === "ES"
-                  ? "Mi definición de éxito"
-                  : "My definition of success"}
-              </span>
-
-              <span
-                className={`text-sm font-semibold ${
-                  cyberMode
-                    ? "text-[#00ff66]"
-                    : "text-white"
-                }`}
-              >
+        {/* Enfoque personal */}
+        <section className={`overflow-hidden rounded-[1.6rem] p-6 sm:p-8 ${surface}`}>
+          <div className="grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${eyebrow}`}>
+                02 — {t.about.formacion.paradigm.label}
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+                {t.about.formacion.paradigm.title}
+              </h3>
+              <p className={`mt-4 text-sm leading-7 ${muted}`}>
+                {t.about.formacion.paradigm.description}
+              </p>
+              <div className={`mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold ${
+                cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-blue-50 text-blue-800"
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${cyberMode ? "bg-[#00ff66]" : "bg-blue-600"}`} />
                 {t.about.formacion.paradigm.success}
-              </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {values.map((value, index) => (
+                <div key={value} className={`rounded-xl border p-4 transition-transform duration-300 hover:-translate-y-1 ${
+                  cyberMode ? "border-[#00ff66]/10 bg-black/20" : "border-blue-100 bg-[#F5F8FC]"
+                }`}>
+                  <span className={`text-[10px] font-semibold tracking-[0.15em] ${eyebrow}`}>0{index + 1}</span>
+                  <p className={`mt-5 text-sm font-semibold ${cyberMode ? "text-[#d9ffe3]/80" : "text-slate-800"}`}>{value}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="mt-4">
-          <div className="mb-4 flex items-end justify-between gap-5">
+        {/* Competencias */}
+        <section>
+          <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <p
-                className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                  cyberMode
-                    ? "text-[#00ff66]/35"
-                    : "text-black/30"
-                }`}
-              >
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${eyebrow}`}>
                 03 — {t.about.formacion.competencies.label}
               </p>
-
-              <h3
-                className={`mt-2 text-2xl font-semibold tracking-tight ${
-                  cyberMode
-                    ? "text-[#eafff0]"
-                    : "text-black"
-                }`}
-              >
+              <h3 className={`mt-2 text-2xl font-semibold tracking-tight ${cyberMode ? "text-[#eafff0]" : "text-slate-900"}`}>
                 {t.about.formacion.competencies.title}
               </h3>
             </div>
-
-            <Code2
-              size={22}
-              strokeWidth={1.5}
-              className={
-                cyberMode
-                  ? "text-[#00ff66]/30"
-                  : "text-black/20"
-              }
-            />
+            <Code2 size={22} strokeWidth={1.6} className={cyberMode ? "text-[#00ff66]/55" : "text-blue-700/60"} />
           </div>
-
           <div className="grid gap-4 md:grid-cols-2">
-            <div
-              className={`rounded-[1.5rem] p-7 transition-transform duration-300 hover:-translate-y-1 ${
-                cyberMode
-                  ? "border border-[#00ff66]/10 bg-[#030804] text-[#eafff0]"
-                  : "bg-black text-white"
-              }`}
-            >
+            <div className={`rounded-[1.4rem] p-6 ${cyberMode ? "border border-[#00ff66]/10 bg-[#030b05] text-[#eafff0]" : "border border-blue-100 bg-[#F2F6FC] text-slate-900"}`}>
               <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                    cyberMode
-                      ? "bg-[#00ff66]/5"
-                      : "bg-white/10"
-                  }`}
-                >
-                  <Code2
-                    size={18}
-                    strokeWidth={1.6}
-                    className={
-                      cyberMode
-                        ? "text-[#00ff66]"
-                        : undefined
-                    }
-                  />
-                </div>
-
+                <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-blue-100 text-blue-800"}`}><Code2 size={18} /></span>
                 <div>
-                  <p
-                    className={`text-[10px] font-medium uppercase tracking-[0.18em] ${
-                      cyberMode
-                        ? "text-[#00ff66]/35"
-                        : "text-white/35"
-                    }`}
-                  >
-                    Technical
-                  </p>
-
-                  <h4 className="mt-1 font-semibold">
-                    {t.about.formacion.competencies.hardSkills}
-                  </h4>
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${eyebrow}`}>Technical</p>
+                  <h4 className="mt-0.5 font-semibold">{t.about.formacion.competencies.hardSkills}</h4>
                 </div>
               </div>
-
-              <div className="mt-7 flex flex-wrap gap-2">
-                {t.about.formacion.competencies.hard.map(
-                  (skill) => (
-                    <span
-                      key={skill}
-                      className={`rounded-full border px-3 py-2 text-xs transition-colors duration-300 ${
-                        cyberMode
-                          ? "border-[#00ff66]/10 text-[#d9ffe3]/65 hover:border-[#00ff66]/30 hover:text-[#00ff66]"
-                          : "border-white/10 text-white/65 hover:border-white/30 hover:text-white"
-                      }`}
-                    >
-                      {skill}
-                    </span>
-                  ),
-                )}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {hard.map((skill) => <span key={skill} className={`rounded-lg border px-3 py-2 text-xs font-medium ${
+                  cyberMode ? "border-[#00ff66]/10 bg-[#00ff66]/[0.04] text-[#d9ffe3]/75" : "border-blue-100 bg-white text-slate-700"
+                }`}>{skill}</span>)}
               </div>
             </div>
-
-            <div
-              className={`rounded-[1.5rem] p-7 transition-transform duration-300 hover:-translate-y-1 ${
-                cyberMode
-                  ? "border border-[#00ff66]/10 bg-[#07100a] text-[#eafff0]"
-                  : "bg-white"
-              }`}
-            >
+            <div className={`rounded-[1.4rem] p-6 ${cyberMode ? "border border-[#00ff66]/10 bg-[#07100a] text-[#eafff0]" : "border border-slate-200 bg-white text-slate-900"}`}>
               <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                    cyberMode
-                      ? "bg-[#00ff66]/5"
-                      : "bg-[#F3F4F6]"
-                  }`}
-                >
-                  <Brain
-                    size={18}
-                    strokeWidth={1.6}
-                    className={
-                      cyberMode
-                        ? "text-[#00ff66]"
-                        : undefined
-                    }
-                  />
-                </div>
-
+                <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-slate-100 text-slate-700"}`}><Brain size={18} /></span>
                 <div>
-                  <p
-                    className={`text-[10px] font-medium uppercase tracking-[0.18em] ${
-                      cyberMode
-                        ? "text-[#00ff66]/35"
-                        : "text-black/25"
-                    }`}
-                  >
-                    Personal
-                  </p>
-
-                  <h4 className="mt-1 font-semibold">
-                    {t.about.formacion.competencies.softSkills}
-                  </h4>
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${cyberMode ? "text-[#00ff66]/55" : "text-slate-400"}`}>Personal</p>
+                  <h4 className="mt-0.5 font-semibold">{t.about.formacion.competencies.softSkills}</h4>
                 </div>
               </div>
-
-              <div className="mt-7 flex flex-wrap gap-2">
-                {t.about.formacion.competencies.soft.map(
-                  (skill) => (
-                    <span
-                      key={skill}
-                      className={`rounded-full px-3 py-2 text-xs transition-colors duration-300 ${
-                        cyberMode
-                          ? "bg-[#00ff66]/5 text-[#d9ffe3]/60 hover:bg-[#00ff66]/10 hover:text-[#00ff66]"
-                          : "bg-[#F3F4F6] text-black/60 hover:bg-black hover:text-white"
-                      }`}
-                    >
-                      {skill}
-                    </span>
-                  ),
-                )}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {soft.map((skill) => <span key={skill} className={`rounded-lg px-3 py-2 text-xs font-medium ${
+                  cyberMode ? "bg-[#00ff66]/[0.06] text-[#d9ffe3]/70" : "bg-slate-100 text-slate-700"
+                }`}>{skill}</span>)}
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     );
   }
 
-  const languages: Language[] =
-    sidebarTranslations[language].languageNames.map(
-      ({ name, level }) => ({
-        name,
-        level,
-      }),
-    );
+  const languages: Language[] = t.languageNames.map(({ name, level }) => ({ name, level }));
+  const languageCards = [
+    { ...languages[0], number: "01", percentage: "100%", width: "w-full", note: language === "ES" ? "Dominio nativo" : "Native proficiency" },
+    { ...languages[1], number: "02", percentage: "100%", width: "w-full", note: language === "ES" ? "Dominio nativo" : "Native proficiency" },
+    { ...languages[2], number: "03", percentage: "B2", width: "w-3/5", note: language === "ES" ? "Nivel intermedio" : "Intermediate level" },
+  ];
 
   return (
     <div className="animate-[fadeIn_400ms_ease-out]">
-      <div className="mb-8">
-        <p
-          className={`text-xs font-medium uppercase tracking-[0.2em] ${
-            cyberMode
-              ? "text-[#00ff66]/35"
-              : "text-black/35"
-          }`}
-        >
-          {t.languagesTitle}
-        </p>
-
-        <h3
-          className={`mt-4 max-w-3xl text-3xl font-semibold tracking-tight ${
-            cyberMode
-              ? "text-[#eafff0]"
-              : "text-black"
-          }`}
-        >
-          {t.communication}
-        </h3>
+      <div className="mb-6">
+        <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${eyebrow}`}>{t.languagesTitle}</p>
+        <h3 className={`mt-2 text-3xl font-semibold tracking-tight ${cyberMode ? "text-[#eafff0]" : "text-slate-900"}`}>{t.communication}</h3>
+        <p className={`mt-2 text-sm ${muted}`}>{language === "ES" ? "Idiomas y nivel de comunicación." : "Languages and communication level."}</p>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div
-          className={`group relative overflow-hidden rounded-[1.75rem] p-7 transition-all duration-500 hover:-translate-y-1 ${
-            cyberMode
-              ? "border border-[#00ff66]/10 bg-[#030804] text-[#eafff0]"
-              : "bg-black text-white"
-          }`}
-        >
-          <div className="flex items-start justify-between">
-            <span
-              className={`text-xs font-medium tracking-[0.18em] ${
-                cyberMode
-                  ? "text-[#00ff66]/35"
-                  : "text-white/35"
-              }`}
-            >
-              01
-            </span>
-
-            <Languages
-              size={21}
-              strokeWidth={1.5}
-              className={`transition-transform duration-500 group-hover:rotate-6 ${
-                cyberMode
-                  ? "text-[#00ff66]/45"
-                  : "text-white/40"
-              }`}
-            />
-          </div>
-
-          <div className="mt-16">
-            <p
-              className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                cyberMode
-                  ? "text-[#00ff66]/35"
-                  : "text-white/35"
-              }`}
-            >
-              {languages[0].level}
-            </p>
-
-            <h4 className="mt-3 text-4xl font-semibold tracking-tight">
-              {languages[0].name}
-            </h4>
-
-            <div className="mt-8 flex items-end justify-between">
-              <span
-                className={`text-xs ${
-                  cyberMode
-                    ? "text-[#d9ffe3]/35"
-                    : "text-white/35"
-                }`}
-              >
-                {t.level}
-              </span>
-
-              <span
-                className={`text-sm font-semibold ${
-                  cyberMode
-                    ? "text-[#00ff66]/70"
-                    : "text-white/70"
-                }`}
-              >
-                100%
-              </span>
+      <div className="grid gap-3 md:grid-cols-3">
+        {languageCards.map((item) => (
+          <article key={item.name} className={`relative overflow-hidden rounded-2xl border p-6 transition-transform duration-300 hover:-translate-y-1 ${
+            cyberMode ? "border-[#00ff66]/10 bg-[#030b05] text-[#eafff0]" : "border-black/[0.06] bg-white text-slate-900"
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] font-semibold tracking-[0.16em] ${eyebrow}`}>{item.number}</span>
+              <Languages size={19} className={cyberMode ? "text-[#00ff66]/55" : "text-blue-700/60"} />
             </div>
-
-            <div
-              className={`mt-3 h-1.5 overflow-hidden rounded-full ${
-                cyberMode
-                  ? "bg-[#00ff66]/10"
-                  : "bg-white/10"
-              }`}
-            >
-              <div
-                className={`h-full w-full origin-left rounded-full transition-transform duration-500 group-hover:scale-x-[0.97] ${
-                  cyberMode
-                    ? "bg-[#00ff66]"
-                    : "bg-white"
-                }`}
-              />
+            <p className={`mt-8 text-[10px] font-semibold uppercase tracking-[0.16em] ${muted}`}>{item.note}</p>
+            <h4 className="mt-2 text-2xl font-semibold tracking-tight">{item.name}</h4>
+            <div className="mt-7 flex items-center justify-between text-xs">
+              <span className={muted}>{t.level}</span>
+              <span className={`font-semibold ${cyberMode ? "text-[#00ff66]" : "text-blue-700"}`}>{item.level}</span>
             </div>
-          </div>
-
-          <div
-            className={`pointer-events-none absolute -bottom-24 -right-16 h-52 w-52 rounded-full border transition-transform duration-700 group-hover:scale-110 ${
-              cyberMode
-                ? "border-[#00ff66]/10"
-                : "border-white/10"
-            }`}
-          />
-        </div>
-
-        <div
-          className={`group relative overflow-hidden rounded-[1.75rem] p-7 transition-all duration-500 hover:-translate-y-1 ${
-            cyberMode
-              ? "border border-[#00ff66]/10 bg-[#07100a] text-[#eafff0]"
-              : "bg-white"
-          }`}
-        >
-          <div className="flex items-start justify-between">
-            <span
-              className={`text-xs font-medium tracking-[0.18em] ${
-                cyberMode
-                  ? "text-[#00ff66]/30"
-                  : "text-black/25"
-              }`}
-            >
-              02
-            </span>
-
-            <Languages
-              size={20}
-              strokeWidth={1.5}
-              className={`transition-transform duration-500 group-hover:rotate-6 ${
-                cyberMode
-                  ? "text-[#00ff66]/35"
-                  : "text-black/30"
-              }`}
-            />
-          </div>
-
-          <div className="mt-16">
-            <p
-              className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                cyberMode
-                  ? "text-[#00ff66]/30"
-                  : "text-black/30"
-              }`}
-            >
-              {languages[1].level}
-            </p>
-
-            <h4 className="mt-3 text-4xl font-semibold tracking-tight">
-              {languages[1].name}
-            </h4>
-
-            <div className="mt-8 flex items-end justify-between">
-              <span
-                className={`text-xs ${
-                  cyberMode
-                    ? "text-[#d9ffe3]/30"
-                    : "text-black/30"
-                }`}
-              >
-                {t.level}
-              </span>
-
-              <span
-                className={`text-sm font-semibold ${
-                  cyberMode
-                    ? "text-[#00ff66]/60"
-                    : "text-black/55"
-                }`}
-              >
-                100%
-              </span>
+            <div className={`mt-2 h-1.5 overflow-hidden rounded-full ${cyberMode ? "bg-[#00ff66]/10" : "bg-slate-100"}`}>
+              <div className={`h-full rounded-full ${item.width} ${cyberMode ? "bg-[#00ff66]" : "bg-blue-700"}`} />
             </div>
-
-            <div
-              className={`mt-3 h-1.5 overflow-hidden rounded-full ${
-                cyberMode
-                  ? "bg-[#00ff66]/10"
-                  : "bg-[#F3F4F6]"
-              }`}
-            >
-              <div
-                className={`h-full w-full origin-left rounded-full transition-transform duration-500 group-hover:scale-x-[0.97] ${
-                  cyberMode
-                    ? "bg-[#00ff66]"
-                    : "bg-black"
-                }`}
-              />
-            </div>
-          </div>
-
-          <div
-            className={`pointer-events-none absolute -bottom-24 -right-16 h-52 w-52 rounded-full border transition-transform duration-700 group-hover:scale-110 ${
-              cyberMode
-                ? "border-[#00ff66]/10"
-                : "border-black/5"
-            }`}
-          />
-        </div>
-
-        <div
-          className={`group relative overflow-hidden rounded-[1.75rem] p-7 transition-all duration-500 hover:-translate-y-1 md:col-span-2 ${
-            cyberMode
-              ? "border border-[#00ff66]/10 bg-[#0a160d] text-[#eafff0]"
-              : "bg-[#E8EEF7]"
-          }`}
-        >
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <span
-                className={`text-xs font-medium tracking-[0.18em] ${
-                  cyberMode
-                    ? "text-[#00ff66]/30"
-                    : "text-black/25"
-                }`}
-              >
-                03
-              </span>
-
-              <span
-                className={`h-1 w-1 rounded-full ${
-                  cyberMode
-                    ? "bg-[#00ff66]/30"
-                    : "bg-black/20"
-                }`}
-              />
-
-              <span
-                className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] ${
-                  cyberMode
-                    ? "bg-[#00ff66]/10 text-[#00ff66]/70"
-                    : "bg-white text-black/55"
-                }`}
-              >
-                B2
-              </span>
-            </div>
-
-            <Languages
-              size={20}
-              strokeWidth={1.5}
-              className={`transition-transform duration-500 group-hover:rotate-6 ${
-                cyberMode
-                  ? "text-[#00ff66]/35"
-                  : "text-black/30"
-              }`}
-            />
-          </div>
-
-          <div className="mt-10 grid gap-8 md:grid-cols-[1fr_1.4fr] md:items-end">
-            <div>
-              <p
-                className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                  cyberMode
-                    ? "text-[#00ff66]/30"
-                    : "text-black/30"
-                }`}
-              >
-                {languages[2].level}
-              </p>
-
-              <h4 className="mt-3 text-4xl font-semibold tracking-tight">
-                {languages[2].name}
-              </h4>
-            </div>
-
-            <div>
-              <div className="flex items-end justify-between">
-                <span
-                  className={`text-xs ${
-                    cyberMode
-                      ? "text-[#d9ffe3]/30"
-                      : "text-black/30"
-                  }`}
-                >
-                  {t.level}
-                </span>
-
-                <span
-                  className={`text-sm font-semibold ${
-                    cyberMode
-                      ? "text-[#00ff66]/65"
-                      : "text-black/55"
-                  }`}
-                >
-                  B2
-                </span>
-              </div>
-
-              <div className="mt-3 flex h-2 gap-1">
-                <span
-                  className={`flex-1 rounded-full ${
-                    cyberMode
-                      ? "bg-[#00ff66]"
-                      : "bg-black"
-                  }`}
-                />
-                <span
-                  className={`flex-1 rounded-full ${
-                    cyberMode
-                      ? "bg-[#00ff66]"
-                      : "bg-black"
-                  }`}
-                />
-                <span
-                  className={`flex-1 rounded-full ${
-                    cyberMode
-                      ? "bg-[#00ff66]"
-                      : "bg-black"
-                  }`}
-                />
-                <span
-                  className={`flex-1 rounded-full ${
-                    cyberMode
-                      ? "bg-[#00ff66]/20"
-                      : "bg-black/20"
-                  }`}
-                />
-                <span
-                  className={`flex-1 rounded-full ${
-                    cyberMode
-                      ? "bg-[#00ff66]/10"
-                      : "bg-black/10"
-                  }`}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={`pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full border transition-transform duration-700 group-hover:scale-110 ${
-              cyberMode
-                ? "border-[#00ff66]/10"
-                : "border-black/5"
-            }`}
-          />
-        </div>
+          </article>
+        ))}
       </div>
     </div>
   );
@@ -1216,6 +573,8 @@ export default function Sidebar({
 }: SidebarProps) {
   const avatar = defaultAvatar;
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [sustainabilityOpen, setSustainabilityOpen] = useState(false);
+  const [cvOpen, setCvOpen] = useState(false);
 
   const [activeSection, setActiveSection] =
     useState<AboutSection>("formacion");
@@ -1266,7 +625,7 @@ export default function Sidebar({
   return (
     <>
       <aside
-        className={`flex min-h-full flex-col px-7 py-8 transition-colors duration-700 sm:px-10 lg:px-12 lg:py-10 ${
+        className={`flex h-full min-h-0 flex-col justify-between overflow-hidden px-6 py-7 transition-colors duration-700 sm:px-8 sm:py-7 lg:px-10 lg:py-7 ${
           cyberMode
             ? "bg-[#020602] text-[#eafff0]"
             : "bg-white text-black"
@@ -1274,7 +633,7 @@ export default function Sidebar({
       >
         {/* PERFIL */}
         <div>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-4">
             <div
               className={`relative block shrink-0 ${
                 cyberMode
@@ -1285,7 +644,7 @@ export default function Sidebar({
               <img
                 src={avatar}
                 alt="Martin Reyes Sanhueza"
-                className={`h-20 w-20 rounded-full object-cover transition-all duration-700 ${
+                className={`h-16 w-16 rounded-full object-cover transition-all duration-700 ${
                   cyberMode
                     ? "border border-[#00ff66]/30 grayscale-[20%] contrast-125"
                     : ""
@@ -1302,13 +661,13 @@ export default function Sidebar({
 
             </div>
 
-            <div className="flex min-w-0 flex-col gap-2">
-              <h1 className="text-sm font-semibold tracking-tight">
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <h1 className="text-sm font-semibold tracking-tight sm:text-base">
                 Martin Reyes Sanhueza
               </h1>
 
               <span
-                className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-medium transition-colors duration-500 ${
+                className={`inline-flex w-fit items-center gap-2 rounded-full px-2.5 py-1 text-[9px] font-medium transition-colors duration-500 ${
                   cyberMode
                     ? "border border-[#00ff66]/10 bg-[#00ff66]/5 text-[#00ff66]/70"
                     : "bg-[#F3F4F6] text-black/60"
@@ -1339,9 +698,9 @@ export default function Sidebar({
         </div>
 
         {/* HERO */}
-        <div className="mt-14">
+        <div className="py-5">
           <h2
-            className={`max-w-xl text-[clamp(2.8rem,5vw,5.4rem)] font-semibold leading-[0.95] tracking-[-0.055em] ${
+            className={`max-w-xl text-[clamp(2.5rem,4vw,4.25rem)] font-semibold leading-[0.98] tracking-[-0.055em] ${
               cyberMode
                 ? "animate-[cyberFlicker_5s_ease-in-out_infinite]"
                 : ""
@@ -1349,20 +708,10 @@ export default function Sidebar({
           >
             {sidebarTranslations[language].heroTitle}
           </h2>
-
-          <p
-            className={`mt-8 max-w-xl text-base leading-7 ${
-              cyberMode
-                ? "text-[#d9ffe3]/50"
-                : "text-black/50"
-            }`}
-          >
-            {sidebarTranslations[language].heroDescription}
-          </p>
         </div>
 
         {/* ABOUT ME */}
-        <div className="mt-12">
+        <div className="py-3">
           <button
             type="button"
             onClick={openAbout}
@@ -1383,12 +732,12 @@ export default function Sidebar({
                 {sidebarTranslations[language].profile}
               </p>
 
-              <h3 className="mt-2 text-xl font-semibold tracking-tight">
+              <h3 className="mt-1.5 text-lg font-semibold tracking-tight sm:text-xl">
                 {sidebarTranslations[language].aboutMe}
               </h3>
 
               <p
-                className={`mt-2 text-sm transition-colors ${
+                className={`mt-1 text-xs transition-colors ${
                   cyberMode
                     ? "text-[#d9ffe3]/45 group-hover:text-[#d9ffe3]/60"
                     : "text-black/45 group-hover:text-white/50"
@@ -1414,8 +763,8 @@ export default function Sidebar({
         </div>
 
         {/* FOOTER */}
-        <div className="mt-auto pt-6">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="border-t border-black/5 pt-5">
+          <div className="flex flex-wrap items-center gap-2">
             {[
               { name: "LinkedIn", url: "https://www.linkedin.com/in/martin-reyes-864726298", icon: "linkedin" },
               { name: "Instagram", url: "#", icon: "instagram" },
@@ -1429,7 +778,7 @@ export default function Sidebar({
                 rel={social.url !== "#" ? "noopener noreferrer" : undefined}
                 aria-label={social.name}
                 title={social.name}
-                className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 ${
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 ${
                   cyberMode
                     ? "border-[#00ff66]/15 bg-[#00ff66]/5 text-[#d9ffe3]/55 hover:border-[#00ff66]/50 hover:bg-[#00ff66]/10 hover:text-[#00ff66]"
                     : "border-black/10 bg-[#F3F4F6] text-black/50 hover:border-black/20 hover:bg-black hover:text-white"
@@ -1438,7 +787,7 @@ export default function Sidebar({
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
-                  className="h-[17px] w-[17px]"
+                  className="h-4 w-4"
                   fill="currentColor"
                 >
                   {social.icon === "linkedin" && (
@@ -1456,12 +805,14 @@ export default function Sidebar({
                 </svg>
               </a>
             ))}
+          </div>
 
-            <a
-              href="cv/CV.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+          {/* ACCIONES PRINCIPALES */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCvOpen(true)}
+              className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-[11px] font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
                 cyberMode
                   ? "border-[#00ff66]/20 bg-[#00ff66]/5 text-[#00ff66]/80 hover:border-[#00ff66]/50 hover:bg-[#00ff66]/10"
                   : "border-black/10 bg-[#F3F4F6] text-black/65 hover:border-black/25 hover:bg-black hover:text-white"
@@ -1470,14 +821,27 @@ export default function Sidebar({
               <FileText size={14} strokeWidth={1.8} />
               {language === "ES" ? "Currículum" : "Resume"}
               <ArrowUpRight size={13} strokeWidth={1.8} />
-            </a>
-          </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSustainabilityOpen(true)}
+              className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-[11px] font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+                cyberMode
+                  ? "border-[#00ff66]/20 bg-[#00ff66]/5 text-[#00ff66]/80 hover:border-[#00ff66]/50 hover:bg-[#00ff66]/10"
+                  : "border-black/10 bg-[#F3F4F6] text-black/65 hover:border-black/25 hover:bg-black hover:text-white"
+              }`}
+            >
+              <Leaf size={14} strokeWidth={1.8} />
+              {language === "ES" ? "Sostenibilidad" : "Sustainability"}
+              <ArrowUpRight size={13} strokeWidth={1.8} />
+            </button>
 
           {/* CYBER MODE */}
           <button
             type="button"
             onClick={() => setCyberMode(!cyberMode)}
-            className={`group relative mt-5 flex w-full items-center justify-between overflow-hidden rounded-xl border px-4 py-3 text-left transition-all duration-500 ${
+            className={`group relative inline-flex w-fit items-center gap-3 overflow-hidden rounded-full border px-3 py-1.5 text-left transition-all duration-300 ${
               cyberMode
                 ? "border-[#00ff66]/30 bg-[#00ff66]/5 text-[#00ff66] hover:bg-[#00ff66]/10"
                 : "border-black/5 bg-[#F3F4F6] text-black/55 hover:bg-black hover:text-white"
@@ -1487,13 +851,13 @@ export default function Sidebar({
               <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(0,255,102,0.06),transparent)] animate-[cyberScan_2.5s_linear_infinite]" />
             )}
 
-            <div className="relative flex items-center gap-3">
+            <div className="relative flex items-center gap-2">
               <Terminal
-                size={16}
+                size={13}
                 strokeWidth={1.7}
               />
 
-              <span className="text-xs font-semibold tracking-tight">
+              <span className="text-[10px] font-semibold tracking-tight">
                 {cyberMode
                   ? sidebarTranslations[language]
                       .cyberModeActive
@@ -1502,13 +866,14 @@ export default function Sidebar({
             </div>
 
             <span
-              className={`relative h-2.5 w-2.5 rounded-full transition-all duration-500 ${
+              className={`relative h-2 w-2 rounded-full transition-all duration-500 ${
                 cyberMode
                   ? "bg-[#00ff66] shadow-[0_0_10px_rgba(0,255,102,0.8)]"
                   : "bg-black/20"
               }`}
             />
           </button>
+          </div>
         </div>
       </aside>
 
@@ -1522,10 +887,10 @@ export default function Sidebar({
           }`}
         >
           <div
-            className={`relative flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] shadow-2xl transition-colors duration-700 ${
+            className={`relative flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[1.75rem] shadow-[0_30px_100px_rgba(15,23,42,0.28)] transition-colors duration-700 ${
               cyberMode
                 ? "border border-[#00ff66]/10 bg-[#020602] text-[#eafff0]"
-                : "bg-white"
+                : "border border-white/70 bg-[#F7F9FC] text-slate-900"
             }`}
           >
             {/* HEADER */}
@@ -1581,7 +946,7 @@ export default function Sidebar({
                 </p>
               </div>
 
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-4">
                 <span
                   className={`hidden text-xs font-medium sm:block ${
                     cyberMode
@@ -1639,10 +1004,10 @@ export default function Sidebar({
               </div>
 
               <div
-                className={`mt-5 rounded-[1.75rem] p-5 sm:p-7 lg:p-8 ${
+                className={`mt-5 rounded-[1.5rem] p-3 sm:p-4 lg:p-5 ${
                   cyberMode
                     ? "border border-[#00ff66]/10 bg-[#07100a]"
-                    : "bg-[#F3F4F6]"
+                    : "border border-black/[0.04] bg-[#EEF2F7]"
                 }`}
               >
                 {activeSection && (
@@ -1653,6 +1018,240 @@ export default function Sidebar({
                   />
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUSTAINABILITY OVERLAY */}
+      {sustainabilityOpen && (
+        <div
+          className={`fixed inset-0 z-[110] flex items-center justify-center p-3 backdrop-blur-md sm:p-6 ${cyberMode ? "bg-black/75" : "bg-black/50"}`}
+          onClick={() => setSustainabilityOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sustainability-title"
+            onClick={(event) => event.stopPropagation()}
+            className={`relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-[1.75rem] shadow-2xl ${cyberMode ? "border border-[#00ff66]/10 bg-[#020602] text-[#eafff0]" : "bg-white text-black"}`}
+          >
+            <div className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-5 sm:px-8 ${cyberMode ? "border-[#00ff66]/10" : "border-black/5"}`}>
+              <div>
+                <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/60" : "text-black/40"}`}>
+                  <Leaf size={13} className="mr-2 inline" />{language === "ES" ? "ODS 16 + ODS 17" : "SDG 16 + SDG 17"}
+                </p>
+                <h2 id="sustainability-title" className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {language === "ES" ? "Infancia sin violencia" : "A childhood without violence"}
+                </h2>
+                <p className={`mt-1 text-sm ${cyberMode ? "text-[#d9ffe3]/55" : "text-black/45"}`}>
+                  {language === "ES" ? "Cómo la tecnología puede ayudar a proteger." : "How technology can help protect children."}
+                </p>
+              </div>
+              <button type="button" onClick={() => setSustainabilityOpen(false)} aria-label={language === "ES" ? "Cerrar sostenibilidad" : "Close sustainability"} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors ${cyberMode ? "bg-[#00ff66]/5 text-[#00ff66] hover:bg-[#00ff66] hover:text-black" : "bg-[#F3F4F6] hover:bg-black hover:text-white"}`}>
+                <X size={17} strokeWidth={1.7} />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto px-5 py-5 text-justify sm:px-8 sm:py-7">
+              {/* CABECERA DE LA ACTIVIDAD */}
+              <section className={`mb-5 rounded-2xl border p-4 sm:p-5 ${cyberMode ? "border-[#00ff66]/15 bg-[#07100a]" : "border-black/5 bg-[#F8FAFC]"}`}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/65" : "text-black/40"}`}>{language === "ES" ? "Portafolio profesional digital · RA1" : "Digital professional portfolio · LO1"}</p>
+                    <h3 className="mt-1 text-base font-semibold">{language === "ES" ? "Reflexión: sostenibilidad, ODS y tecnología" : "Reflection: sustainability, SDGs and technology"}</h3>
+                    <p className={`mt-1 text-xs ${cyberMode ? "text-[#d9ffe3]/55" : "text-black/50"}`}>{language === "ES" ? "MP1708 · Sostenibilidad aplicada al sistema productivo" : "MP1708 · Sustainability applied to the productive system"}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1.5 text-xs font-semibold ${cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-white text-black/65"}`}>Martin Reyes Sanhueza</span>
+                </div>
+              </section>
+
+              {/* 01 · DATOS */}
+              <section className={`overflow-hidden rounded-2xl ${cyberMode ? "bg-[#07100a]" : "border border-blue-100 bg-blue-50"}`}>
+                <div className="grid items-center gap-3 p-3 md:grid-cols-[1fr_220px] md:gap-5">
+                  <div className="p-3 sm:p-5">
+                    <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/60" : "text-black/40"}`}>01 — {language === "ES" ? "Datos y opinión" : "Facts and opinion"}</p>
+                    <div className={`mt-4 text-6xl font-semibold tracking-tight ${cyberMode ? "text-[#00ff66]" : "text-[#2563EB]"}`}>1 de cada 2</div>
+                    <p className={`mt-2 max-w-md text-sm leading-6 ${cyberMode ? "text-[#d9ffe3]/70" : "text-black/60"}`}>
+                      {language === "ES" ? "Hasta 1.000 millones de niños de entre 2 y 17 años sufren violencia física, sexual o emocional, o abandono, en un año. Es aproximadamente 1 de cada 2 menores." : "Up to 1 billion children aged 2 to 17 experience physical, sexual or emotional violence, or neglect, in a year. That is approximately 1 in 2 children."}
+                    </p>
+                    <p className={`mt-2 text-[11px] ${cyberMode ? "text-[#d9ffe3]/45" : "text-black/45"}`}>
+                      {language === "ES" ? "Fuente: Organización Mundial de la Salud (OMS), ficha informativa sobre la violencia contra los niños, 7 de mayo de 2026." : "Source: World Health Organization (WHO), Violence against children fact sheet, 7 May 2026."}
+                      {" "}<a href="https://www.who.int/es/news-room/fact-sheets/detail/violence-against-children" target="_blank" rel="noopener noreferrer" className={`underline underline-offset-2 ${cyberMode ? "text-[#00ff66]" : "text-blue-700"}`}>{language === "ES" ? "Consultar fuente" : "View source"}</a>
+                    </p>
+                    <p className={`mt-5 border-l-2 pl-4 text-sm leading-6 ${cyberMode ? "border-[#00ff66]/60 text-[#eafff0]/85" : "border-black/30 text-black/75"}`}>
+                      {language === "ES" ? "Antes de trabajar este tema no era consciente de lo común que puede ser la violencia durante la infancia. Además, he entendido que no siempre es física: también puede presentarse de otras formas y pasar desapercibida. Me alegra que se estén buscando maneras de detectar estas situaciones y evitar que el mismo ciclo se repita." : "Before working on this topic, I was not aware of how common violence during childhood can be. I have also understood that it is not always physical: it can take other forms and go unnoticed. I am glad that ways are being developed to identify these situations and prevent the same cycle from repeating."}
+                    </p>
+                  </div>
+                  <img
+                    src="https://www.unicef.org/cambodia/sites/unicef.org.cambodia/files/styles/media_large_image/public/DSC_0662.jpg.webp?itok=9I4c4Il8"
+                    alt={language === "ES" ? "Profesional ofreciendo apoyo y protección a una niña" : "Professional providing support and protection to a child"}
+                    className="h-36 w-full rounded-xl object-cover md:h-40"
+                  />
+                </div>
+              </section>
+
+              {/* 02 · TECNOLOGÍA */}
+              <section className="mt-7">
+                <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/60" : "text-black/40"}`}>02 — {language === "ES" ? "Solución tecnológica" : "Technology solution"}</p>
+                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                  <div className={`rounded-2xl p-5 sm:p-6 ${cyberMode ? "bg-[#07100a]" : "border border-violet-100 bg-violet-50"}`}>
+                    <h3 className="text-xl font-semibold">Primero / CPIMS+</h3>
+                    <p className={`mt-2 text-sm leading-6 ${cyberMode ? "text-[#d9ffe3]/65" : "text-black/60"}`}>
+                      {language === "ES" ? "Es una herramienta digital que ayuda a los profesionales a registrar casos, hacer seguimiento y coordinar la ayuda a menores." : "A digital tool that helps professionals record cases, follow up and coordinate support for children."}
+                    </p>
+                    <div className={`mt-5 flex flex-wrap gap-2 text-xs font-medium ${cyberMode ? "text-[#00ff66]" : "text-black/65"}`}>
+                      {(language === "ES" ? ["Registrar", "Proteger datos", "Coordinar ayuda"] : ["Record", "Protect data", "Coordinate support"]).map((step) => <span key={step} className={`rounded-full px-3 py-2 ${cyberMode ? "bg-[#00ff66]/10" : "bg-white"}`}>{step}</span>)}
+                    </div>
+                  </div>
+                  <img
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=85"
+                    alt={language === "ES" ? "Panel digital con datos y gráficos" : "Digital dashboard with data and charts"}
+                    className="h-36 w-full rounded-2xl object-cover md:h-40"
+                  />
+                </div>
+              </section>
+
+              {/* 03 · ASG */}
+              <section className="mt-7">
+                <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/60" : "text-black/40"}`}>03 — {language === "ES" ? "ASG y Agenda 2030" : "ESG and 2030 Agenda"}</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  {[
+                    { key: "A", title: language === "ES" ? "Ambiental" : "Environmental", body: language === "ES" ? "La tecnología evita papel y desplazamientos, pero consume energía y genera residuos." : "Technology can reduce paper and travel, but uses energy and creates waste." },
+                    { key: "S", title: language === "ES" ? "Social" : "Social", body: language === "ES" ? "Ayuda a proteger a los menores, aunque no todos tienen el mismo acceso a la tecnología." : "It helps protect children, although not everyone has equal access to technology." },
+                    { key: "G", title: language === "ES" ? "Gobernanza" : "Governance", body: language === "ES" ? "Hay que proteger los datos y evitar que personas no autorizadas accedan a ellos." : "Data must be protected and unauthorized access prevented." },
+                  ].map((item) => (
+                    <article key={item.key} className={`rounded-2xl p-5 ${cyberMode ? "bg-[#07100a]" : item.key === "A" ? "border border-emerald-100 bg-emerald-50" : item.key === "S" ? "border border-sky-100 bg-sky-50" : "border border-amber-100 bg-amber-50"}`}>
+                      <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold ${cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : item.key === "A" ? "bg-emerald-500 text-white" : item.key === "S" ? "bg-sky-500 text-white" : "bg-amber-500 text-white"}`}>{item.key}</span>
+                      <h3 className="mt-3 font-semibold">{item.title}</h3>
+                      <p className={`mt-2 text-sm leading-6 ${cyberMode ? "text-[#d9ffe3]/60" : "text-black/60"}`}>{item.body}</p>
+                    </article>
+                  ))}
+                </div>
+                <div className={`mt-3 flex flex-wrap items-center gap-3 rounded-2xl p-5 ${cyberMode ? "border border-[#00ff66]/10 bg-[#07100a]" : "border border-black/5 bg-white"}`}>
+                  <img src="https://res.cloudinary.com/everydotorg/image/upload/f_auto%2Cc_limit%2Cw_3840%2Cq_auto/faja_covers/kbfus/ltglxjnoil9zikv5jzei" alt={language === "ES" ? "Personas colaborando en un proyecto comunitario" : "People collaborating on a community project"} className="h-16 w-20 rounded-xl object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap gap-2"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-sky-600 text-white"}`}>ODS 16</span><span className={`rounded-full px-3 py-1 text-xs font-semibold ${cyberMode ? "bg-[#00ff66]/10 text-[#00ff66]" : "bg-violet-600 text-white"}`}>ODS 17</span></div>
+                    <p className={`mt-2 text-sm leading-6 ${cyberMode ? "text-[#d9ffe3]/70" : "text-black/65"}`}>{language === "ES" ? "El ODS 16 busca acabar con la violencia. El ODS 17 promueve la colaboración para conseguirlo." : "SDG 16 aims to end violence. SDG 17 promotes cooperation to make it happen."}</p>
+                  </div>
+                </div>
+                <div className={`mt-3 rounded-2xl p-5 sm:p-6 ${cyberMode ? "border border-[#00ff66]/15 bg-[#07100a]" : "border border-black/5 bg-[#F8FAFC]"}`}>
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/65" : "text-black/40"}`}>{language === "ES" ? "Lo que me llevo de esta actividad" : "What I take away from this activity"}</p>
+                  <p className={`mt-3 text-sm leading-7 ${cyberMode ? "text-[#eafff0]/85" : "text-black/70"}`}>
+                    {language === "ES" ? "Esta actividad me ha hecho ver el problema de una forma diferente. No basta con reaccionar cuando ocurre un caso: también es importante contar con profesionales coordinados, herramientas que ayuden a hacer seguimiento y medidas para proteger la información de los menores. CPIMS+ puede facilitar la gestión y coordinación de los casos, pero no sustituye la atención humana ni garantiza por sí solo que el problema desaparezca. Para mí, la tecnología tiene valor cuando se utiliza para ayudar a las personas y se gestiona con responsabilidad." : "This activity has made me see the problem differently. It is not enough to react when a case occurs: professionals need to coordinate, tools should support case follow-up, and measures must protect children's information. CPIMS+ can make case management and coordination easier, but it does not replace human care or guarantee that the problem will disappear by itself. To me, technology is valuable when it is used to help people and managed responsibly."}
+                  </p>
+                </div>
+              </section>
+
+              {/* 04 · PLA DE NEGOCI */}
+              <section className="mt-7">
+                <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/60" : "text-black/40"}`}>04 — {language === "ES" ? "Mi futuro plan de empresa" : "My future business plan"}</p>
+                <div className="mt-3 grid items-center gap-3 overflow-hidden rounded-2xl p-3 md:grid-cols-[190px_1fr]">
+                  <img src="https://assets.seobotai.com/cdn-cgi/image/quality%3D75%2Cw%3D1536%2Ch%3D1024/fiegenbaum.solutions/68a3c7574eebbe86def1a8ba-1755573943639.jpg" alt={language === "ES" ? "Equipo analizando datos de sostenibilidad en una reunión" : "Team reviewing sustainability data in a meeting"} className="h-36 w-full rounded-xl object-cover md:h-40" />
+                  <div className={`rounded-xl p-5 sm:p-6 ${cyberMode ? "bg-[#07100a]" : "bg-orange-50"}`}>
+                    <p className={`text-sm leading-6 ${cyberMode ? "text-[#d9ffe3]/70" : "text-black/65"}`}>
+                      {language === "ES" ? "Si en el futuro desarrollo un proyecto o trabajo en una empresa del ámbito tecnológico, quiero aplicar estos criterios desde el principio: utilizar los recursos de forma eficiente, cuidar a las personas y proteger la información. La sostenibilidad no debería añadirse al final, sino formar parte de las decisiones diarias." : "If I develop a project or work in a technology company in the future, I want to apply these criteria from the start: use resources efficiently, care for people and protect information. Sustainability should not be added at the end; it should be part of everyday decisions."}
+                    </p>
+                    <div className="mt-5 grid grid-cols-2 gap-3">
+                      {(language === "ES" ? ["Ahorrar energía", "Proteger datos", "Reducir residuos", "Actuar con responsabilidad"] : ["Save energy", "Protect data", "Reduce waste", "Act responsibly"]).map((item, index) => (
+                        <div key={item} className={`rounded-xl p-3 text-xs font-medium ${cyberMode ? "bg-black/30 text-[#eafff0]/80" : "bg-white text-black/70"}`}><span className={`mr-2 font-bold ${cyberMode ? "text-[#00ff66]" : "text-black/35"}`}>0{index + 1}</span>{item}</div>
+                      ))}
+                    </div>
+                    <p className={`mt-5 text-sm font-medium leading-6 ${cyberMode ? "text-[#00ff66]" : "text-black"}`}>
+                      {language === "ES" ? "Desde ASIX puedo aportar conocimientos de sistemas, redes y ciberseguridad." : "From ASIX, I can contribute knowledge of systems, networks and cybersecurity."}
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* FUENTES Y EVIDENCIAS */}
+              <section className={`mt-7 rounded-2xl border p-5 sm:p-6 ${cyberMode ? "border-[#00ff66]/15 bg-[#07100a]" : "border-black/5 bg-[#F8FAFC]"}`}>
+                <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cyberMode ? "text-[#00ff66]/65" : "text-black/40"}`}>{language === "ES" ? "Fuentes y evidencias" : "Sources and evidence"}</p>
+                <p className={`mt-2 text-sm leading-6 ${cyberMode ? "text-[#d9ffe3]/60" : "text-black/55"}`}>{language === "ES" ? "He utilizado fuentes institucionales para contrastar el dato y explicar los objetivos y la herramienta digital." : "I used institutional sources to check the statistic and explain the goals and the digital tool."}</p>
+                <ul className={`mt-4 space-y-3 text-sm ${cyberMode ? "text-[#eafff0]/80" : "text-black/70"}`}>
+                  <li><a className={`underline underline-offset-2 ${cyberMode ? "text-[#00ff66]" : "text-blue-700"}`} href="https://www.who.int/es/news-room/fact-sheets/detail/violence-against-children" target="_blank" rel="noopener noreferrer">Organización Mundial de la Salud — Violencia contra los niños</a></li>
+                  <li><a className={`underline underline-offset-2 ${cyberMode ? "text-[#00ff66]" : "text-blue-700"}`} href="https://www.un.org/sustainabledevelopment/es/sustainable-development-goals/" target="_blank" rel="noopener noreferrer">Naciones Unidas — Objetivos de Desarrollo Sostenible</a></li>
+                  <li><a className={`underline underline-offset-2 ${cyberMode ? "text-[#00ff66]" : "text-blue-700"}`} href="https://alliancecpha.org/sites/default/files/technical/attachments/Inter-agency%20Child%20Protection%20Case%20Management%20Guidelines_2nd%20Edition_2024.pdf" target="_blank" rel="noopener noreferrer">The Alliance — Inter-agency Child Protection Case Management Guidelines (2024), CPIMS+ / Primero</a></li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CV OVERLAY */}
+      {cvOpen && (
+        <div
+          className={`fixed inset-0 z-[120] flex items-center justify-center p-3 backdrop-blur-md sm:p-6 ${
+            cyberMode ? "bg-black/75" : "bg-black/50"
+          }`}
+          onClick={() => setCvOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cv-title"
+            onClick={(event) => event.stopPropagation()}
+            className={`relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-[1.75rem] shadow-2xl ${
+              cyberMode
+                ? "border border-[#00ff66]/10 bg-[#020602] text-[#eafff0]"
+                : "bg-white text-black"
+            }`}
+          >
+            <div
+              className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-4 sm:px-8 ${
+                cyberMode ? "border-[#00ff66]/10" : "border-black/5"
+              }`}
+            >
+              <div>
+                <p
+                  className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                    cyberMode ? "text-[#00ff66]/60" : "text-black/40"
+                  }`}
+                >
+                  <FileText size={13} className="mr-2 inline" />
+                  {language === "ES" ? "DOCUMENTACIÓN" : "DOCUMENTS"}
+                </p>
+                <h2 id="cv-title" className="mt-1 text-2xl font-semibold tracking-tight">
+                  {language === "ES" ? "Currículum" : "Resume"}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCvOpen(false)}
+                aria-label={language === "ES" ? "Cerrar currículum" : "Close resume"}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+                  cyberMode
+                    ? "bg-[#00ff66]/5 text-[#00ff66] hover:bg-[#00ff66] hover:text-black"
+                    : "bg-[#F3F4F6] hover:bg-black hover:text-white"
+                }`}
+              >
+                <X size={17} strokeWidth={1.7} />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto px-4 py-4 sm:px-7 sm:py-6">
+              <section className="mb-7">
+                <h3 className="mb-3 text-sm font-semibold">
+                  {language === "ES" ? "Currículum" : "Resume"}
+                </h3>
+                <iframe
+                  src="/cv/CV.pdf"
+                  title="CV"
+                  className="h-[70vh] min-h-[500px] w-full rounded-xl border border-black/10 bg-white"
+                />
+              </section>
+
+              <section>
+                <h3 className="mb-3 text-sm font-semibold">
+                  Martin Reyes Sanhueza
+                </h3>
+                <iframe
+                  src="/cv/Martin%20Reyes%20Sanhueza.pdf"
+                  title="Martin Reyes Sanhueza"
+                  className="h-[70vh] min-h-[500px] w-full rounded-xl border border-black/10 bg-white"
+                />
+              </section>
             </div>
           </div>
         </div>
@@ -1716,4 +1315,4 @@ export default function Sidebar({
       </style>
     </>
   );
-}
+} 
